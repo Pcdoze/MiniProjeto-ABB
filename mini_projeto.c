@@ -93,12 +93,6 @@ void gotoxy(int coluna, int linha)
 // Exibir a arvore - Procedimento recursivo, usando um percurso pre-ordem.
 // sugestao de uso: exibirGraficamente(arvore, 10, 10, 3);
 
-int offsetTexto(char * texto){
-    int offset;
-
-
-    return offset;
-}
 void exibirGraficamente(t_arvore tree, int col, int lin, int desloc)
 {
     // col e lin sao as coordenadas da tela onde a arvore ira iniciar,
