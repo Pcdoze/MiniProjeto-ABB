@@ -93,22 +93,52 @@ void gotoxy(int coluna, int linha)
 // Exibir a arvore - Procedimento recursivo, usando um percurso pre-ordem.
 // sugestao de uso: exibirGraficamente(arvore, 10, 10, 3);
 
+int offsetTexto(char * texto){
+    int offset;
+
+
+    return offset;
+}
 void exibirGraficamente(t_arvore tree, int col, int lin, int desloc)
 {
     // col e lin sao as coordenadas da tela onde a arvore ira iniciar,
     // ou seja, a posicao da raiz, e desloc representa o deslocamento na tela
     // (em colunas) de um no em relacao ao no anterior.
+    char texto[50];
+
     if (tree == NULL)
         return; // condicao de parada do procedimento recursivo
 
-    gotoxy(col,lin);
+    sprintf(texto, "%d: %s", tree->info->rgm, tree->info->nome);
+    gotoxy(col-strlen(texto)/2,lin);
 
-    printf("%d ", tree->info->rgm);
+    printf("%s", texto);
+
     if (tree->esq != NULL)
         exibirGraficamente(tree->esq,col-desloc,lin+2,desloc/2+1);
 
     if (tree->dir != NULL)
         exibirGraficamente(tree->dir,col+desloc,lin+2,desloc/2+1);
+}
+int exibirArvore(t_arvore tree){
+    system("cls");
+    exibirGraficamente(tree, 15 , 2 , 20);
+
+    int * inicial = (int*) malloc(sizeof(int));
+
+    *inicial = 1;
+    printf("\n\n\n\n\npré-ordem: ");
+    exibirPreOrdem(tree, inicial);
+
+    *inicial = 1;
+    printf("\nin-ordem: ");
+    exibirInOrdem(tree, inicial);
+
+    *inicial = 1;
+    printf("\npós-ordem: ");
+    exibirPosOrdem(tree, inicial);
+
+    free(inicial);
 }
 
 int inserir (t_arvore * tree, int rgm, char *nome)
@@ -125,14 +155,12 @@ int inserir (t_arvore * tree, int rgm, char *nome)
 
         if (el){
             el->rgm = rgm;
-
             el->nome = nome;
         }
         else
             return 0;
 
         (*tree)->info = el;
-
         return 1;
     }
 
@@ -144,7 +172,7 @@ int inserir (t_arvore * tree, int rgm, char *nome)
         else
             ok = 0;
 
-	return ok;
+    return ok;
 }
 
 t_no * busca(t_arvore tree, int rgm)
@@ -265,25 +293,39 @@ char *getNome(){
 
     return nome;
 }
-int exibirArvore(t_arvore tree){
-    system("cls");
-    exibirGraficamente(tree, 15 , 2 , 4);
 
-    int * inicial = (int*) malloc(sizeof(int));
+int inserirDoArquivo(t_arvore * tree) {
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
 
-    *inicial = 1;
-    printf("\n\n\n\n\npré-ordem: ");
-    exibirPreOrdem(tree, inicial);
+    fp = fopen("./arvore.txt", "r");
 
-    *inicial = 1;
-    printf("\nin-ordem: ");
-    exibirInOrdem(tree, inicial);
+    if (fp == NULL) printf("\narquivo não encontrado");
 
-    *inicial = 1;
-    printf("\npós-ordem: ");
-    exibirPosOrdem(tree, inicial);
+    while ((read = getline(&line, &len, fp)) != -1) {
+        char *nome = malloc(sizeof(char) * 50);
+        int rgm;
 
-    free(inicial);
+        char *n = strchr(line, '\0')-1;
+        if(*n == '\n'){
+            *n = '\0';
+        }
+        char *separador = strchr(line, ':');
+        nome = strcpy(nome, separador+1); *separador = '\0';
+        rgm = atoi(line);
+
+        inserir(tree, rgm, nome);
+    }
+    fclose(fp);
+    return 1;
+}
+int inserirNoArquivo(){
+
+}
+int limparArquivo(){
+
 }
 
 int loop_principal(t_arvore arvore){
@@ -347,34 +389,7 @@ int main ()
     setlocale(LC_ALL, "Portuguese");
 
     t_arvore arvore = NULL;
+    inserirDoArquivo(&arvore);
+
     loop_principal(arvore);
-
-    /*
-	t_arvore arvore = NULL;
-
-
-	inserir(&arvore, 35);
-	inserir(&arvore, 15);
-	inserir(&arvore, 30);
-	inserir(&arvore, 8);
-	inserir(&arvore, 45);
-	inserir(&arvore, 10);
-	inserir(&arvore, 43);
-	inserir(&arvore, 55);
-	inserir(&arvore, 2);
-
-	exibirPreOrdem(arvore); printf("\n");
-	exibirInOrdem(arvore); printf("\n");
-	exibirPosOrdem(arvore); printf("\n");
-
-	exibirGraficamente(arvore, 15 , 5 , 4); printf("\n\n\n\n");
-
-	busca(arvore, 15);
-
-	remover(&arvore, 15);
-
-	exibirGraficamente(arvore, 15 , 15 , 4); printf("\n");
-
-	getchar();
-	*/
 }
