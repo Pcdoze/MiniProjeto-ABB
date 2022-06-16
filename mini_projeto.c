@@ -39,27 +39,46 @@ int isVazia (t_arvore tree){
 	return (tree == NULL);
 }
 
-void exibirPreOrdem(t_arvore tree) {
+void exibirPreOrdem(t_arvore tree, int *inicial) {
     if (tree!=NULL) {
-        printf("%d ", tree->info->rgm);
-        exibirPreOrdem(tree->esq);
-        exibirPreOrdem(tree->dir);
+        if(!(*inicial))
+            printf(", ");
+        else
+            *inicial = 0;
+
+        printf("%d: %s", tree->info->rgm, tree->info->nome);
+
+        exibirPreOrdem(tree->esq, inicial);
+        exibirPreOrdem(tree->dir, inicial);
     }
 }
 
-void exibirInOrdem(t_arvore tree) {
+void exibirInOrdem(t_arvore tree, int *inicial) {
     if (tree!=NULL) {
-        exibirInOrdem(tree->esq);
-        printf("%d ", tree->info->rgm);
-        exibirInOrdem(tree->dir);
+        exibirInOrdem(tree->esq, inicial);
+
+        if(!(*inicial))
+            printf(", ");
+        else
+            *inicial = 0;
+
+        printf("%d: %s", tree->info->rgm, tree->info->nome);
+
+        exibirInOrdem(tree->dir, inicial);
     }
 }
 
-void exibirPosOrdem(t_arvore tree) {
+void exibirPosOrdem(t_arvore tree, int *inicial) {
     if (tree!=NULL) {
-        exibirPosOrdem(tree->esq);
-        exibirPosOrdem(tree->dir);
-        printf("%d ", tree->info->rgm);
+        exibirPosOrdem(tree->esq, inicial);
+        exibirPosOrdem(tree->dir, inicial);
+
+        if(!(*inicial))
+            printf(", ");
+        else
+            *inicial = 0;
+
+        printf("%d: %s", tree->info->rgm, tree->info->nome);
     }
 }
 
@@ -222,6 +241,14 @@ int remover (t_arvore * tree, int rgm) {
 
     return 1; // verdadeiro, conseguiu remover
 }
+int esvaziarArvore(t_arvore * tree){
+    if ((*tree)!=NULL) {
+        printf("\n1");
+        esvaziarArvore(&((*tree)->esq));
+        esvaziarArvore(&((*tree)->dir));
+        remover(tree, (*tree)->info->rgm);
+    }
+}
 int getRGM(){
     int rgm;
     printf("\nDigite um rgm: ");
@@ -238,6 +265,27 @@ char *getNome(){
 
     return nome;
 }
+int exibirArvore(t_arvore tree){
+    system("cls");
+    exibirGraficamente(tree, 15 , 2 , 4);
+
+    int * inicial = (int*) malloc(sizeof(int));
+
+    *inicial = 1;
+    printf("\n\n\n\n\npré-ordem: ");
+    exibirPreOrdem(tree, inicial);
+
+    *inicial = 1;
+    printf("\nin-ordem: ");
+    exibirInOrdem(tree, inicial);
+
+    *inicial = 1;
+    printf("\npós-ordem: ");
+    exibirPosOrdem(tree, inicial);
+
+    free(inicial);
+}
+
 int loop_principal(t_arvore arvore){
     int escolha;
     printf("\n\nEscolha uma opção: ");
@@ -275,11 +323,12 @@ int loop_principal(t_arvore arvore){
         loop_principal(arvore);
         break;
     case 4:
+        esvaziarArvore(&arvore);
+
         loop_principal(arvore);
         break;
     case 5:
-        system("cls");
-        exibirGraficamente(arvore, 15 , 5 , 4);
+        exibirArvore(arvore);
 
         loop_principal(arvore);
         break;
