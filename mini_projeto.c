@@ -298,6 +298,7 @@ char *getNome(){
         printf("\nEntrada Inválida");
         getNome();
     }
+    nome[strcspn(nome, "\n")] = '\0';
 
     return nome;
 }
