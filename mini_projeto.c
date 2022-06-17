@@ -116,7 +116,7 @@ void exibirGraficamente(t_arvore tree, int col, int lin, int desloc)
 }
 int exibirArvore(t_arvore tree){
     system("cls");
-    exibirGraficamente(tree, 15 , 2 , 20);
+    exibirGraficamente(tree, 30 , 2 , 20);
 
     int * inicial = (int*) malloc(sizeof(int));
 
@@ -272,18 +272,32 @@ int esvaziarArvore(t_arvore * tree){
     }
 }
 int getRGM(){
+    char rgm_str[50];
     int rgm;
+
     printf("\nDigite um rgm: ");
-    scanf("%d", &rgm);
-    fflush(stdin);
+    if(fgets(rgm_str, 50, stdin)==NULL){
+        printf("\nEntrada Inválida");
+        getRGM();
+    }
+    else{
+        rgm = atoi(rgm_str);
+        if(rgm == 0){
+            printf("\nnúmero não permitido!");
+            return getRGM();
+        }
+    }
 
     return rgm;
 }
 char *getNome(){
     char *nome = malloc (sizeof (char) * 50);
+
     printf("\nDigite um nome: ");
-    scanf("%s", nome);
-    fflush(stdin);
+    if(fgets(nome, 50, stdin)==NULL){
+        printf("\nEntrada Inválida");
+        getNome();
+    }
 
     return nome;
 }
@@ -315,11 +329,25 @@ int inserirDoArquivo(t_arvore * tree) {
     fclose(fp);
     return 1;
 }
-int inserirNoArquivo(){
-
-}
 int limparArquivo(){
+    FILE * fp;
 
+    fp = fopen ("./arvore.txt", "w");
+    fclose(fp);
+}
+int criarArquivo(t_arvore tree){
+    if (tree!=NULL) {
+        FILE * fp;
+
+        fp = fopen ("./arvore.txt", "a");
+        fprintf(fp, "%d:%s\n", tree->info->rgm, tree->info->nome);
+
+        fclose(fp);
+
+        criarArquivo(tree->esq);
+        criarArquivo(tree->dir);
+    }
+    return 1;
 }
 
 int loop_principal(t_arvore arvore){
@@ -341,11 +369,15 @@ int loop_principal(t_arvore arvore){
     }
 
     switch(escolha){
-    case 1:
-        inserir(&arvore, getRGM(), getNome());
+    case 1:{
+        int rgm = getRGM();
+        char *nome = getNome();
+
+        inserir(&arvore, rgm, nome);
 
         loop_principal(arvore);
         break;
+    }
     case 2:
         if(remover(&arvore, getRGM())){
             printf("nó removido!");
@@ -377,6 +409,8 @@ int loop_principal(t_arvore arvore){
         break;
 
     }
+    limparArquivo();
+    criarArquivo(arvore);
 }
 int main ()
 {
